@@ -76,7 +76,7 @@ DB_CONFIG = {
 # ------------------------------------------------------------
 # Security
 # ------------------------------------------------------------
-SECRET_KEY = os.getenv("SECRET_KEY", "")
+SECRET_KEY = os.getenv("SECRET_KEY", "8f3c2a9d7e1b4f6a9c2d5e8f1a7b3c6d9e2f4a8b6c1d7e5f9a3c8b2e6d4f17a3")
 SESSION_TIMEOUT_MINUTES = _get_int("SESSION_TIMEOUT_MINUTES", 30)
 
 # ------------------------------------------------------------
