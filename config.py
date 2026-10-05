@@ -1,0 +1,128 @@
+"""
+config.py
+Global configuration for SmartAttend AI.
+Loads secrets from .env and exposes paths, DB settings, and
+default AI thresholds used across the application.
+"""
+
+import os
+from pathlib import Path
+from dotenv import load_dotenv
+
+# ------------------------------------------------------------
+# Load environment variables from .env
+# ------------------------------------------------------------
+BASE_DIR = Path(__file__).resolve().parent
+load_dotenv(BASE_DIR / ".env")
+
+
+def _get_bool(key: str, default: bool = False) -> bool:
+    return os.getenv(key, str(default)).strip().lower() in ("1", "true", "yes")
+
+
+def _get_float(key: str, default: float) -> float:
+    try:
+        return float(os.getenv(key, default))
+    except (TypeError, ValueError):
+        return default
+
+
+def _get_int(key: str, default: int) -> int:
+    try:
+        return int(os.getenv(key, default))
+    except (TypeError, ValueError):
+        return default
+
+
+# ------------------------------------------------------------
+# App Metadata
+# ------------------------------------------------------------
+APP_NAME = "SmartAttend AI"
+APP_VERSION = "1.0.0"
+APP_ENV = os.getenv("APP_ENV", "development")
+DEBUG = _get_bool("DEBUG", True)
+
+# ------------------------------------------------------------
+# Paths
+# ------------------------------------------------------------
+ASSETS_DIR = BASE_DIR / "assets"
+DATA_DIR = BASE_DIR / "data"
+STUDENT_PHOTOS_DIR = DATA_DIR / "student_photos"
+UNKNOWN_FACES_DIR = DATA_DIR / "unknown_faces"
+BACKUPS_DIR = DATA_DIR / "backups"
+ML_MODELS_DIR = BASE_DIR / "ml_models"
+LOGS_DIR = BASE_DIR / "logs"
+
+for directory in (
+    STUDENT_PHOTOS_DIR,
+    UNKNOWN_FACES_DIR,
+    BACKUPS_DIR,
+    ML_MODELS_DIR,
+    LOGS_DIR,
+):
+    directory.mkdir(parents=True, exist_ok=True)
+
+# ------------------------------------------------------------
+# Database
+# ------------------------------------------------------------
+DB_CONFIG = {
+    "host": os.getenv("DB_HOST", "localhost"),
+    "port": _get_int("DB_PORT", 3306),
+    "database": os.getenv("DB_NAME", "smartattend_ai"),
+    "user": os.getenv("DB_USER", "root"),
+    "password": os.getenv("DB_PASSWORD", ""),
+}
+
+# ------------------------------------------------------------
+# Security
+# ------------------------------------------------------------
+SECRET_KEY = os.getenv("SECRET_KEY", "8f3c2a9d7e1b4f6a9c2d5e8f1a7b3c6d9e2f4a8b6c1d7e5f9a3c8b2e6d4f17a3")
+SESSION_TIMEOUT_MINUTES = _get_int("SESSION_TIMEOUT_MINUTES", 30)
+
+# ------------------------------------------------------------
+# Email / SMTP
+# ------------------------------------------------------------
+SMTP_CONFIG = {
+    "host": os.getenv("SMTP_HOST", "smtp.gmail.com"),
+    "port": _get_int("SMTP_PORT", 587),
+    "username": os.getenv("SMTP_USERNAME", "jayprajapati7699@gmail.com"),
+    "password": os.getenv("SMTP_PASSWORD", "dklu juut ntdu jejc"),
+    "from_name": os.getenv("SMTP_FROM_NAME", APP_NAME),
+}
+
+# ------------------------------------------------------------
+# Twilio (WhatsApp / SMS) - optional
+# ------------------------------------------------------------
+TWILIO_CONFIG = {
+    "account_sid": os.getenv("TWILIO_ACCOUNT_SID", "ACa71b4c04924b1d866392e398cfc94787"),
+    "auth_token": os.getenv("TWILIO_AUTH_TOKEN", "6fd6dda783f1759568cb23a35123c36d"),
+    "whatsapp_number": os.getenv("TWILIO_WHATSAPP_NUMBER", "+14155238886"),
+}
+
+# ------------------------------------------------------------
+# Firebase - optional
+# ------------------------------------------------------------
+FIREBASE_CREDENTIALS_PATH = os.getenv(
+    "FIREBASE_CREDENTIALS_PATH", "assets/firebase_credentials.json"
+)
+
+# ------------------------------------------------------------
+# Face Recognition / AI Thresholds
+# (fallback defaults; admin panel can override via system_settings table)
+# ------------------------------------------------------------
+RECOGNITION_THRESHOLD = _get_float("RECOGNITION_THRESHOLD", 0.6)
+LIVENESS_THRESHOLD = _get_float("LIVENESS_THRESHOLD", 0.5)
+BLUR_THRESHOLD = _get_float("BLUR_THRESHOLD", 100.0)
+
+# ------------------------------------------------------------
+# Camera
+# ------------------------------------------------------------
+DEFAULT_CAMERA_INDEX = _get_int("DEFAULT_CAMERA_INDEX", 0)
+
+# ------------------------------------------------------------
+# UI
+# ------------------------------------------------------------
+UI_APPEARANCE_MODE = "System"   # "System", "Light", "Dark"
+UI_COLOR_THEME = "blue"         # customtkinter built-in theme
+WINDOW_MIN_WIDTH = 1200
+WINDOW_MIN_HEIGHT = 720
